@@ -42,7 +42,7 @@ class LocationsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Enable deletion by tapping a NavBar Edit button
+    // Enable deletion by tapping a NavBar Edit button
         
         navigationItem.rightBarButtonItem = editButtonItem
         
@@ -57,7 +57,7 @@ class LocationsViewController: UITableViewController {
         }
     }
     
-    // Invoked when the view controlled is destroyed. Set the delegate to nil when the FetchedResultsController is no longer needed
+    // Invoke when the view controlled is destroyed. Set the delegate to nil when the FetchedResultsController is no longer needed
     
     deinit {
         fetchedResultsController.delegate = nil

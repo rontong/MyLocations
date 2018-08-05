@@ -134,7 +134,7 @@ class LocationDetailsViewController: UITableViewController {
         }
     }
     
-    // Limits ability of the user to tap rows; only first two sections can be tapped as the third section is read only.
+    // Limit ability of the user to tap rows; only first two sections can be tapped as the third section is read only.
     
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         if indexPath.section == 0 || indexPath.section == 1 {
@@ -166,7 +166,7 @@ class LocationDetailsViewController: UITableViewController {
     // Saving takes any objects that were added to the context or any managed objects that had contents changed and writes these into the data store.
     // Save method can fail; use a do-try-catch to catch any potential errors. If unable to perform the try, then Xcode skips that and jumps to the catch section. 
     
-    // Calls the free function afterDelay; executing the closure then results in self.dismiss.
+    // Call the free function afterDelay; executing the closure then results in self.dismiss.
     // Trailing Closure Syntax: you can place a closure behind a function call if it is the last parameter
     
     @IBAction func done() {
@@ -202,7 +202,7 @@ class LocationDetailsViewController: UITableViewController {
         dismiss(animated: true, completion: nil)
     }
     
-    // Asks DateFormatter to turn the Date into a String, then returns that
+    // Ask DateFormatter to turn the Date into a String, then returns that
     
     func format(date: Date) -> String{
         return dateFormatter.string(from: date)

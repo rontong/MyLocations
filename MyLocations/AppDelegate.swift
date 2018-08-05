@@ -40,8 +40,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     lazy var managedObjectContext: NSManagedObjectContext = self.persistentContainer.viewContext
     
-    // Give the currentLocationVC the managedObjectContext reference to talk to CoreData. Get a reference to currentLocationVC by finding UITabBarController and looking at its viewControllers array
-    // Give the locationsVC the managed Object Context reference as well
+    // Use didFinishLaunchingWithOptions to give any VCs the managed Object Context reference to talk to Core Data 
+    // Gives the currentLocationVC, locationsVC and MapVC the managed Object Context reference
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
@@ -54,6 +54,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let navigationController = tabBarViewControllers[1] as! UINavigationController
             let locationsViewController = navigationController.viewControllers[0] as! LocationsViewController
             locationsViewController.managedObjectContext = managedObjectContext
+            
+            let mapViewController = tabBarViewControllers[2] as! MapViewController
+            mapViewController.managedObjectContext = managedObjectContext
             
             let _ = locationsViewController.view
         }
