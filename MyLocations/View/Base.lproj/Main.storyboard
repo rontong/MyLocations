@@ -383,7 +383,7 @@
         <!--Root View Controller-->
         <scene sceneID="Idf-On-k78">
             <objects>
-                <tableViewController id="j2P-7f-O84" customClass="LocationsViewController" customModule="MyLocations" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="j2P-7f-O84" customClass="LocationsViewController" customModule="MyLocations" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="57" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="kb6-bi-pe7" customClass="LocationsViewController">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -415,7 +415,7 @@
                                 <connections>
                                     <outlet property="addressLabel" destination="hS7-IC-zFl" id="Rf8-k8-9x2"/>
                                     <outlet property="descriptionLabel" destination="jbB-pS-nOW" id="cku-xA-Sxm"/>
-                                    <segue destination="w2T-md-S4K" kind="presentation" id="uvx-up-itc"/>
+                                    <segue destination="w2T-md-S4K" kind="presentation" identifier="EditLocation" id="uvx-up-itc"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -452,6 +452,6 @@
         <image name="first" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="Q0G-dm-daz"/>
+        <segue reference="uvx-up-itc"/>
     </inferredMetricsTieBreakers>
 </document>
