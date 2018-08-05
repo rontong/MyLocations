@@ -17,7 +17,7 @@ class LocationsViewController: UITableViewController {
     
     // Instantiate a fetchedResultsController with a fetch Request and set the delegate. If any Location objects change after the initial fetch, the delegate methods are called to notify you of changes
     // Fetch request describes the parameters for objects to be retrieved from the data store
-    // Make a fetch request with an entity and sort descriptor, only fetching 20 objects at a time, <Location> tells NSFetchRequest to return an array of location objects
+    // Make a fetch request with an entity and sort descriptors, only fetching 20 objects at a time, <Location> tells NSFetchRequest to return an array of location objects
     // Make the fetchedResultsController using the fetch request, context, and a unique cache name
     
     lazy var fetchedResultsController: NSFetchedResultsController<Location> = {
@@ -27,12 +27,13 @@ class LocationsViewController: UITableViewController {
         let entity = Location.entity()
         fetchRequest.entity = entity
         
-        let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
-        fetchRequest.sortDescriptors = [sortDescriptor]
+        let sortDescriptor1 = NSSortDescriptor(key: "category", ascending: true)
+        let sortDescriptor2 = NSSortDescriptor(key: "date", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor1, sortDescriptor2]
         
         fetchRequest.fetchBatchSize = 20
         
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.managedObjectContext, sectionNameKeyPath: nil, cacheName: "Locations")
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.managedObjectContext, sectionNameKeyPath: "category", cacheName: "Locations")
         
         fetchedResultsController.delegate = self
         return fetchedResultsController
@@ -40,6 +41,10 @@ class LocationsViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Enable deletion by tapping a NavBar Edit button
+        
+        navigationItem.rightBarButtonItem = editButtonItem
         
         performFetch()
     }
@@ -84,7 +89,7 @@ class LocationsViewController: UITableViewController {
     }
     
     
-    // Asks the fetchedResultsControlled for the object at the requested index-path
+    // Ask the fetchedResultsController for the object at the requested index-path
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "LocationCell", for: indexPath) as! LocationCell
@@ -94,6 +99,34 @@ class LocationsViewController: UITableViewController {
         
         return cell
         
+    }
+    
+    // Ask the fetchedResultsController for the number of sections and title for each section
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return fetchedResultsController.sections!.count
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let sectionInfo = fetchedResultsController.sections![section]
+        return sectionInfo.name
+    }
+    
+    // Implement (commit, for Row) to enable swipe-to-delete function
+    // Tell the context to delete the object. This triggers fetchedresultsController to send a notification to the delegate. The delegate will then remove the row from the table
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+      
+        if editingStyle == .delete {
+            let location = fetchedResultsController.object(at: indexPath)
+            managedObjectContext.delete(location)
+            
+            do {
+                try managedObjectContext.save()
+            } catch {
+                fatalCoreDataError(error)
+            }
+        }
     }
     
 }
