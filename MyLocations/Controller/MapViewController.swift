@@ -24,7 +24,26 @@ class MapViewController: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
     
-    var managedObjectContext: NSManagedObjectContext!
+    // Use a Property Observer to listen for changes to the data store and update the MapView when a notification is received
+    
+    // When the NSManagedObjectContext is given a value the didSet block is performed. Tell the NotificationCenter to add an observer for the NSManagedObjectContextObjectsDidChange notification
+    // managedObjectContext sends out this notification whenever the data store changes. Call the closure whenever the notification is received
+    
+    var managedObjectContext: NSManagedObjectContext! {
+        didSet {
+            NotificationCenter.default.addObserver(forName: Notification.Name.NSManagedObjectContextObjectsDidChange, object: managedObjectContext, queue: OperationQueue.main) { (notification) in
+                if self.isViewLoaded{
+                    self.updateLocations()
+                    
+                    if let dictionary = notification.userInfo {
+                        print(dictionary["inserted"])
+                        print(dictionary["deleted"])
+                        print(dictionary["updated"])
+                    }
+                }
+            }
+        }
+    }
     
     var locations = [Location]()
     
@@ -39,6 +58,8 @@ class MapViewController: UIViewController {
      let theRegion = region(for: locations)
         mapView.setRegion(theRegion, animated: true)
     }
+    
+    // Removes existing annotations, fetches Location objects and adds annotations to the MapView
     
     func updateLocations() {
         mapView.removeAnnotations(locations)
@@ -89,8 +110,89 @@ class MapViewController: UIViewController {
         return mapView.regionThatFits(region)
         
         }
+    
+    // Invoke when disclosure button on a pin callout is tapped
+    
+    @objc func showLocationDetails(_ sender: UIButton) {
+        performSegue(withIdentifier: "EditLocation", sender: sender)
+    }
+    
+    // Prepare for segue when disclosure button on pin callout is tapped
+    // Give the LocationDetailsVC the managedObjectContext and locationToEdit (using the button.tag)
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "EditLocation" {
+            let navigationController = segue.destination as! UINavigationController
+            let controller = navigationController.topViewController as! LocationDetailsViewController
+            
+            controller.managedObjectContext = managedObjectContext
+            
+            let button = sender as! UIButton
+            let location = locations[button.tag]
+            controller.locationToEdit = location
+        }
+    }
 }
 
+    // MARK: - Map View Delegate Methods
+
 extension MapViewController: MKMapViewDelegate {
+   
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+      
+        // Guard statement: if the result is nil/false then perform the code in the else block
+        // If annotation is a Location object then continue. Otherwise return nil and do not make an annotation for the object
+        
+        guard annotation is Location else {
+            return nil
+        }
+        
+        // Ask Map View to reuse an annotation view object. If it cannot recycle an annotation then create a new one
+        
+        let identifier = "Location"
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+        
+        if annotationView == nil {
+            let pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+            
+            pinView.isEnabled = true
+            pinView.canShowCallout = true
+            pinView.animatesDrop = false
+            pinView.pinTintColor = UIColor(red: 0.32, green: 0.82, blue: 0.4, alpha: 1)
+            
+            // Create a UIButton that looks like a detail disclosure and link the touchUpInside action with a showLocationDetails method
+            
+            let rightButton = UIButton(type: .detailDisclosure)
+            rightButton.addTarget(self, action: #selector(showLocationDetails), for: .touchUpInside)
+            
+            pinView.rightCalloutAccessoryView = rightButton
+            
+            annotationView = pinView
+        }
+        
+        // If an annotationView exists (annotation view object has been reused or created) then set the annotation to the location object
+        
+        if let annotationView = annotationView {
+            annotationView.annotation = annotation
+            
+            // Obtain a reference to the detail disclosure button and set its tag to the index of the Location object in the array
+            
+            let button = annotationView.rightCalloutAccessoryView as! UIButton
+            if let index = locations.index(of: annotation as! Location) {
+                button.tag = index
+            }
+        }
+        return annotationView
+    }
+}
+
+    // MARK: - Navigation Bar Delegate Methods
+
+    // Extend the navigation bar to be underneath the status bar area
+
+extension MapViewController: UINavigationBarDelegate {
     
+    func position(for bar: UIBarPositioning) -> UIBarPosition {
+        return .topAttached
+    }
 }
