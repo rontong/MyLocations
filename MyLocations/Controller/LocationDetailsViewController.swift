@@ -199,21 +199,15 @@ class LocationDetailsViewController: UITableViewController {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var addPhotoLabel: UILabel!
     
-    // Creates a HUD by calling the HudView class' hud class function.
-    
-    // Only ask Core Data for a new Location object if you don't already have one. 
-    
-    // Create a location instance; use the init(context:) method  because this is a managed object. If just using Location() then managedObjectContext won't know about this new object.
-    // Set properties to the location instance, then call the save method
-    // Saving takes any objects that were added to the context or any managed objects that had contents changed and writes these into the data store.
-    // Save method can fail; use a do-try-catch to catch any potential errors. If unable to perform the try, then Xcode skips that and jumps to the catch section. 
-    
-    // Call the free function afterDelay; executing the closure then results in self.dismiss.
-    // Trailing Closure Syntax: you can place a closure behind a function call if it is the last parameter
-    
     @IBAction func done() {
+        
+        // Set properties of the Location Object
+        
+        // Create a HUD by calling the HudView class' hud class function.
         let hudView = HudView.hud(inView: navigationController!.view, animated: true)
         
+        // Only ask Core Data for a new Location object if you don't already have one.
+        // Create a location instance; use the init(context:) method  because this is a managed object. If just using Location() then managedObjectContext won't know about this new object.
         let location: Location
         if let temp = locationToEdit {
             hudView.text = "Updated"
@@ -221,6 +215,7 @@ class LocationDetailsViewController: UITableViewController {
         } else {
             hudView.text = "Tagged"
             location = Location(context: managedObjectContext)
+            location.photoID = nil
         }
         
         location.locationDescription = descriptionTextView.text
@@ -230,6 +225,35 @@ class LocationDetailsViewController: UITableViewController {
         location.date = date
         location.placemark = placemark
         
+        // Save image to the photoURL
+        
+        if let image = image {
+            
+            // If photo exists already keep the same ID. If adding a new photo then generate a new ID
+            if !location.hasPhoto {
+                print("*** LocationDetails VC, No photo found")
+                location.photoID = Location.nextPhotoID() as NSNumber
+            }
+            
+            // Convert UIImage to JPEG format and return a Data object
+            if let data = UIImageJPEGRepresentation(image, 0.5){
+                
+                // Save the Data object to the photoURL path
+                print("*** Saving Data to \(location.photoURL)")
+                do {
+                    try data.write(to: location.photoURL, options: .atomic)
+                } catch {
+                    print("Error writing file: \(error)")
+                }
+            }
+        }
+        
+        // Save the Managed Object Context
+        
+        // Call the free function afterDelay; executing the closure then results in self.dismiss.
+        // Trailing Closure Syntax: you can place a closure behind a function call if it is the last parameter
+        // Saving takes any objects that were added to the context or any managed objects that had contents changed and writes these into the data store.
+        // Save method can fail; use a do-try-catch to catch any potential errors. If unable to perform the try, then Xcode skips that and jumps to the catch section.
         do {
             try managedObjectContext.save()
         afterDelay(0.6) {self.dismiss(animated: true, completion: nil)
