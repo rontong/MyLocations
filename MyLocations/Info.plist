@@ -4,6 +4,8 @@
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app lets you keep track of interesting places. It needs access to the GPS coordinates for your location</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Add photos to your location</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

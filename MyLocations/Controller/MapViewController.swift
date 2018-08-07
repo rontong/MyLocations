@@ -13,6 +13,8 @@ import CoreData
 
 class MapViewController: UIViewController {
     
+    var locations = [Location]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         updateLocations()
@@ -35,6 +37,8 @@ class MapViewController: UIViewController {
                 if self.isViewLoaded{
                     self.updateLocations()
                     
+                    // TO DO: - Edit code to only update inserted, deleted, and updated annotations
+                    
                     if let dictionary = notification.userInfo {
                         print(dictionary["inserted"])
                         print(dictionary["deleted"])
@@ -44,8 +48,6 @@ class MapViewController: UIViewController {
             }
         }
     }
-    
-    var locations = [Location]()
     
     @IBAction func showUser() {
         let region = MKCoordinateRegionMakeWithDistance(mapView.userLocation.coordinate, 1000, 1000)

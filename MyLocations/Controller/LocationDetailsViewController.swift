@@ -11,9 +11,11 @@ import UIKit
 import CoreLocation
 import CoreData
 
-// Private global constant. Only performed the first time dateFormatter global is used in the app. Cannot be used outside of this swift file but lives outside of the class.
-// Utilises a closure {}() to create the new object AND set properties in one go
-// Code inside the closure creates and initializes the DateFormatter object, then returns DateFormatter to be put into instance dateFormatter
+    // MARK: - Date Formatter
+
+    // Private global constant. Only performed the first time dateFormatter global is used in the app. Cannot be used outside of this swift file but lives outside of the class.
+    // Utilises a closure {}() to create the new object AND set properties in one go
+    // Code inside the closure creates and initializes the DateFormatter object, then returns DateFormatter to be put into instance dateFormatter
 
 private let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
@@ -22,6 +24,7 @@ private let dateFormatter: DateFormatter = {
     print("*** Date Formatting Done")
     return formatter
 }()
+    // MARK: - Location Details View Controller
 
 class LocationDetailsViewController: UITableViewController {
     
@@ -29,7 +32,20 @@ class LocationDetailsViewController: UITableViewController {
     var placemark: CLPlacemark?
     var categoryName = "No Category"
     var date = Date()
-
+    
+    var dynamicHeight = CGFloat()
+    var observer: Any!
+    
+     // Property Observer: if the image is changed, call show(image:image)
+    
+    var image: UIImage? {
+        didSet{
+            if let image = image {
+                show(image: image)
+            }
+        }
+    }
+    
     // Property Observer: if a variable has didSet then code within the block is performed whenever you put a new value into the variable
     
     var locationToEdit: Location? {
@@ -76,6 +92,8 @@ class LocationDetailsViewController: UITableViewController {
         gestureRecognizer.cancelsTouchesInView = false
         tableView.addGestureRecognizer(gestureRecognizer)
         
+        listenForBackgroundNotification()
+        
     }
     
     func string(from placemark: CLPlacemark) -> String {
@@ -117,20 +135,34 @@ class LocationDetailsViewController: UITableViewController {
         descriptionTextView.resignFirstResponder()
     }
     
-    // MARK: - UITableViewDelegate. Called when table view loads cells; use it to tell table view how tall each cell is
-    // Determine the width of the label (115 accounts for Address label and margins, and space between cells. Set height to 10000 then size to fit (use word-wrapping)
-    // Change the x-position to fit the label to the right edge of the screen, and add margins (10 top and 10 bottom) for the final height
+    // MARK: - UITableViewDelegate Methods.
+    
+    // Call when table view loads cells; use it to tell table view how tall each cell is
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 && indexPath.row == 0 {
+        
+        switch (indexPath.section, indexPath.row) {
+            
+        // Description Cell (section 0 row 0) has height 88
+        case (0,0):
             return 88
-        } else if indexPath.section == 2 && indexPath.row == 2 {
+       
+        // Add Photo Cell (section 1). If there is no image then default height 44. If there is an image then set the height to the dynamic height
+        // Ternary Conditional Operator => condition ? a : b. If condition is true then return a, otherwise b.
+        case (1, _):
+            return imageView.isHidden ? 44 : 280
+            
+        // Address Cell (section 2, row 2). Determine the width of the label (115 accounts for Address label and margins, and space between cells. Set height to 10000 then size to fit (use word-wrapping)
+        // Change the x-position to fit the label to the right edge of the screen, and add margins (10 top and 10 bottom) for the final height
+        case (2, 2):
             addressLabel.frame.size = CGSize(width: view.bounds.size.width - 115, height: 10000)
             addressLabel.sizeToFit()
             addressLabel.frame.origin.x = view.bounds.size.width - addressLabel.frame.size.width - 15
             return addressLabel.frame.size.height + 20
-        } else {
-            return 44
+       
+        // All other cells have default height 44 (Category, Latitude, Longitude, Date Cells)
+            default:
+                return 44
         }
     }
     
@@ -144,11 +176,18 @@ class LocationDetailsViewController: UITableViewController {
         }
     }
     
+    // Open the keyboard if the first section and first row is tapped (Description). Perform camera function if the second section is tapped. 
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 && indexPath.row == 0 {
             descriptionTextView.becomeFirstResponder()
+        } else if indexPath.section == 1 && indexPath.row == 0 {
+            tableView.deselectRow(at: indexPath, animated: true)
+            pickPhoto()
         }
     }
+    
+    // MARK: - IBOutlets
     
     @IBOutlet weak var descriptionTextView: UITextView!
     @IBOutlet weak var categoryLabel: UILabel!
@@ -156,6 +195,9 @@ class LocationDetailsViewController: UITableViewController {
     @IBOutlet weak var longitudeLabel: UILabel!
     @IBOutlet weak var addressLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
+    
+    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var addPhotoLabel: UILabel!
     
     // Creates a HUD by calling the HudView class' hud class function.
     
@@ -221,5 +263,108 @@ class LocationDetailsViewController: UITableViewController {
         let controller = segue.source as! CategoryPickerViewController
         categoryName = controller.selectedCategoryName
         categoryLabel.text = categoryName
+    }
+    
+    // Puts the image into imageView and gives it proper dimensions
+    
+    func show(image: UIImage) {
+        
+        let aspectRatio = image.size.width / image.size.height
+        dynamicHeight = (CGFloat(260) / aspectRatio)
+        
+        imageView.image = image
+        imageView.isHidden = false
+        imageView.frame = CGRect(x: 10, y: 10, width: 260, height: dynamicHeight)
+        addPhotoLabel.isHidden = true
+    }
+    
+    // Dismiss alert or action sheet from screen when app is placed into background
+    // Observer for UIApplicationDidEnterBackground notification; call closure when notification is received to dismiss image picker or action sheet
+    
+    func listenForBackgroundNotification() {
+        
+        // [weak self] is the capture list. self is captured with a weak reference (isntead of strong)
+        observer = NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidEnterBackground, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            
+            // Image Picker & Action Sheet are presented as modal view controllers. If presentedViewController is not nil then dismiss to close the modal screen.
+            if let strongSelf = self {
+                if strongSelf.presentedViewController != nil {
+                strongSelf.dismiss(animated: false, completion: nil)
+            }
+            strongSelf.descriptionTextView.resignFirstResponder()
+            }
+        }
+    }
+    
+    deinit {
+        print("*** deinit \(self)")
+        NotificationCenter.default.removeObserver(observer)
+    }
+}
+
+// MARK: - UIImagePickerController & NavigationController
+
+// Create the ImagePickerController, set properties, the delegate, and then present it
+
+extension LocationDetailsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate{
+    
+    // Invoke when user selects a photo in the image picker
+    // Info dictionary contains data describing the image the user picked. Use the UIImagePickerControllerEditedImiage key to retrieve the UIImage object and store it in the image variable
+    // If there is an image that is not nil, then call show(image) to put it in the Add Photo Cell
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        
+        image = info[UIImagePickerControllerEditedImage] as? UIImage
+        
+        tableView.reloadData()
+        
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    // If a camera is present then call give options to take a photo or show photo. Otherwise only allow chooseFromLibrary action.
+    
+    func pickPhoto() {
+        // Uncomment to test actionSheet. if true || UIImagePickerController.isSourceTypeAvailable(.camera){
+        
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            showPhotoMenu()
+        } else {
+            choosePhotoFromLibrary()
+        }
+    }
+    
+    func showPhotoMenu() {
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(cancelAction)
+        
+        let takePhotoAction = UIAlertAction(title: "Take Photo", style: .default, handler: { _ in self.takePhotoWithCamera()})
+        alertController.addAction(takePhotoAction)
+        
+        let chooseFromLibraryAction = UIAlertAction(title: "Choose From Library", style: .default, handler: {_ in self.choosePhotoFromLibrary()})
+        alertController.addAction(chooseFromLibraryAction)
+        
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    func choosePhotoFromLibrary() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.sourceType = .photoLibrary
+        imagePicker.delegate = self
+        imagePicker.allowsEditing = true
+        present(imagePicker, animated: true, completion: nil)
+    }
+    
+    func takePhotoWithCamera() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.sourceType = .camera
+        imagePicker.delegate = self
+        imagePicker.allowsEditing = true
+        present(imagePicker, animated: true, completion: nil)
     }
 }
