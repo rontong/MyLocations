@@ -24,6 +24,7 @@ private let dateFormatter: DateFormatter = {
     print("*** Date Formatting Done")
     return formatter
 }()
+
     // MARK: - Location Details View Controller
 
 class LocationDetailsViewController: UITableViewController {
@@ -73,6 +74,11 @@ class LocationDetailsViewController: UITableViewController {
         
         if let location = locationToEdit{
             title = "Edit Location"
+            if location.hasPhoto {
+                if let theImage = location.photoImage {
+                    show(image: theImage)
+                }
+            }
         }
         
         descriptionTextView.text = descriptionText
@@ -150,7 +156,7 @@ class LocationDetailsViewController: UITableViewController {
         // Add Photo Cell (section 1). If there is no image then default height 44. If there is an image then set the height to the dynamic height
         // Ternary Conditional Operator => condition ? a : b. If condition is true then return a, otherwise b.
         case (1, _):
-            return imageView.isHidden ? 44 : 280
+            return imageView.isHidden ? 44 : dynamicHeight + 20
             
         // Address Cell (section 2, row 2). Determine the width of the label (115 accounts for Address label and margins, and space between cells. Set height to 10000 then size to fit (use word-wrapping)
         // Change the x-position to fit the label to the right edge of the screen, and add margins (10 top and 10 bottom) for the final height
@@ -181,6 +187,7 @@ class LocationDetailsViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 && indexPath.row == 0 {
             descriptionTextView.becomeFirstResponder()
+            
         } else if indexPath.section == 1 && indexPath.row == 0 {
             tableView.deselectRow(at: indexPath, animated: true)
             pickPhoto()

@@ -12,18 +12,17 @@ class LocationCell : UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
     
     @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var addressLabel: UILabel!
-
+    
+    @IBOutlet weak var photoImageView: UIImageView!
+    
     func configure(for location: Location) {
         if location.locationDescription.isEmpty {
             descriptionLabel.text = "(No Description)"
@@ -46,5 +45,17 @@ class LocationCell : UITableViewCell {
         } else {
             addressLabel.text = String(format: "Lat: %.8f, Long: %.8f", location.latitude, location.longitude)
         }
+        photoImageView.image = thumbnail(for: location)
+    }
+    
+    // Set thumbnail for the Location Cell
+    func thumbnail(for location: Location) -> UIImage {
+        
+        // If location has a photo and location.photoImage can be unwrapped, return the unwrapped image
+        // ALT: if location.hasPhoto { if let image = location.photoImage { return image } }
+        if location.hasPhoto, let image = location.photoImage {
+            return image.resizedImage(withBounds: CGSize(width: 52, height: 52))
+        }
+        return UIImage()
     }
 }

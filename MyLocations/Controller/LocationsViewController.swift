@@ -119,6 +119,9 @@ class LocationsViewController: UITableViewController {
       
         if editingStyle == .delete {
             let location = fetchedResultsController.object(at: indexPath)
+            
+            // Remove photo file on the location object, then delete location object from Core Data context
+            location.removePhotoFile()
             managedObjectContext.delete(location)
             
             do {

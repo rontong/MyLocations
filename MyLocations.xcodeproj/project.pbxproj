@@ -24,6 +24,7 @@
 		F2AF659D20ECC452007C70C6 /* CategoryPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2AF659C20ECC452007C70C6 /* CategoryPickerViewController.swift */; };
 		F2AF659F20ECD6E1007C70C6 /* HudView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2AF659E20ECD6E1007C70C6 /* HudView.swift */; };
 		F2B69EE320F079A500B90FA0 /* LocationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2B69EE220F079A500B90FA0 /* LocationCell.swift */; };
+		F2C5FB19211AC9B900762A94 /* UIImage+Resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C5FB18211AC9B900762A94 /* UIImage+Resize.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		F2AF659C20ECC452007C70C6 /* CategoryPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryPickerViewController.swift; sourceTree = "<group>"; };
 		F2AF659E20ECD6E1007C70C6 /* HudView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HudView.swift; sourceTree = "<group>"; };
 		F2B69EE220F079A500B90FA0 /* LocationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCell.swift; sourceTree = "<group>"; };
+		F2C5FB18211AC9B900762A94 /* UIImage+Resize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Resize.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +84,7 @@
 				F2AF659E20ECD6E1007C70C6 /* HudView.swift */,
 				F24B37D520ED93DA0010A440 /* Functions.swift */,
 				F2B69EE220F079A500B90FA0 /* LocationCell.swift */,
+				F2C5FB18211AC9B900762A94 /* UIImage+Resize.swift */,
 				F295C73D20E89F1300D8F4D9 /* CurrentLocationViewController.swift */,
 				F24B37DE20EDCBED0010A440 /* LocationsViewController.swift */,
 				F220878F2116E57000F78F44 /* MapViewController.swift */,
@@ -216,6 +219,7 @@
 				F2AF659F20ECD6E1007C70C6 /* HudView.swift in Sources */,
 				F24B37DF20EDCBED0010A440 /* LocationsViewController.swift in Sources */,
 				F22087902116E57000F78F44 /* MapViewController.swift in Sources */,
+				F2C5FB19211AC9B900762A94 /* UIImage+Resize.swift in Sources */,
 				F24B37DD20EDA2BE0010A440 /* Location+CoreDataProperties.swift in Sources */,
 				F24B37D620ED93DA0010A440 /* Functions.swift in Sources */,
 				F295C73C20E89F1300D8F4D9 /* AppDelegate.swift in Sources */,

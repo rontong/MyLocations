@@ -387,7 +387,7 @@
             </objects>
             <point key="canvasLocation" x="2404" y="147"/>
         </scene>
-        <!--Root View Controller-->
+        <!--Locations-->
         <scene sceneID="Idf-On-k78">
             <objects>
                 <tableViewController id="j2P-7f-O84" customClass="LocationsViewController" customModule="MyLocations" sceneMemberID="viewController">
@@ -404,24 +404,29 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" tag="101" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hS7-IC-zFl">
-                                            <rect key="frame" x="16" y="29" width="288" height="17"/>
+                                            <rect key="frame" x="82" y="29" width="238" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.49563891267123289" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" tag="100" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Description" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jbB-pS-nOW">
-                                            <rect key="frame" x="16" y="11" width="288" height="21"/>
+                                            <rect key="frame" x="82" y="11" width="238" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="doZ-Rc-qTu">
+                                            <rect key="frame" x="15" y="2" width="52" height="52"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        </imageView>
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="addressLabel" destination="hS7-IC-zFl" id="Rf8-k8-9x2"/>
                                     <outlet property="descriptionLabel" destination="jbB-pS-nOW" id="cku-xA-Sxm"/>
+                                    <outlet property="photoImageView" destination="doZ-Rc-qTu" id="1eF-9P-au2"/>
                                     <segue destination="w2T-md-S4K" kind="presentation" identifier="EditLocation" id="uvx-up-itc"/>
                                 </connections>
                             </tableViewCell>
@@ -431,7 +436,7 @@
                             <outlet property="delegate" destination="j2P-7f-O84" id="8dJ-RE-vyM"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Root View Controller" id="1AT-JT-QXc"/>
+                    <navigationItem key="navigationItem" title="Locations" id="1AT-JT-QXc"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xCU-Ac-XJ6" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -509,6 +514,6 @@
         <image name="first" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="D9J-l8-hye"/>
+        <segue reference="uvx-up-itc"/>
     </inferredMetricsTieBreakers>
 </document>
