@@ -86,8 +86,7 @@ class LocationsViewController: UITableViewController {
         
         let sectionInfo = fetchedResultsController.sections![section]
         return sectionInfo.numberOfObjects
-    }
-    
+    }    
     
     // Ask the fetchedResultsController for the object at the requested index-path
     
