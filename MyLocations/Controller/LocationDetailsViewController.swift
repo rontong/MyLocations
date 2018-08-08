@@ -103,27 +103,39 @@ class LocationDetailsViewController: UITableViewController {
     }
     
     func string(from placemark: CLPlacemark) -> String {
-        var text = ""
-        if let s = placemark.subThoroughfare {
-            text += s + " "
-        }
-        if let s = placemark.thoroughfare {
-            text += s + ", "
-        }
-        if let s = placemark.locality {
-            text += s + ", "
-        }
-        if let s = placemark.administrativeArea {
-            text += s + " "
-        }
-        if let s = placemark.postalCode {
-            text += s + ", "
-        }
-        if let s = placemark.country {
-            text += s
-        }
-        return text
-        }
+        
+        var line = ""
+        line.add(text: placemark.subThoroughfare, separatedBy: " ")
+        line.add(text: placemark.thoroughfare, separatedBy: ", ")
+        line.add(text: placemark.locality, separatedBy: ", ")
+        line.add(text: placemark.administrativeArea, separatedBy: ", ")
+        line.add(text: placemark.postalCode, separatedBy: " ")
+        line.add(text: placemark.country, separatedBy: ", ")
+        return line
+    }
+        
+        // MARK: - OLD CODE
+//        var text = ""
+//        if let s = placemark.subThoroughfare {
+//            text += s + " "
+//        }
+//        if let s = placemark.thoroughfare {
+//            text += s + ", "
+//        }
+//        if let s = placemark.locality {
+//            text += s + ", "
+//        }
+//        if let s = placemark.administrativeArea {
+//            text += s + " "
+//        }
+//        if let s = placemark.postalCode {
+//            text += s + ", "
+//        }
+//        if let s = placemark.country {
+//            text += s
+//        }
+//        return text
+//        }
     
     // gestureRecognizer.location returns a CGPoint (struct) that contains an x and y position
     // Determine the indexPath at the selected point; if that indexPath is not the text view (section 0 and row 0) then return and do not hide the keyboard. Otherwise hide the keyboard.
