@@ -10,31 +10,61 @@
 import UIKit
 import CoreLocation
 import CoreData
+import QuartzCore
+import AudioToolbox
 
-class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate {
-
-    let locationManager = CLLocationManager()
-    let geocoder = CLGeocoder()
+class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate, CAAnimationDelegate {
     
-    // Location is optional as it is possible NOT to have a location (ie when there is no cell tower or GPS), or location is nil whilst waiting for CL to report back with a CLLocation object. Similarly lastLocationError is optional as there may not be an error at all times
+    @IBOutlet weak var messageLabel: UILabel!
+    @IBOutlet weak var latitudeLabel: UILabel!
+    @IBOutlet weak var longitudeLabel: UILabel!
+    @IBOutlet weak var addressLabel: UILabel!
+    @IBOutlet weak var tagButton: UIButton!
+    @IBOutlet weak var getButton: UIButton!
+    @IBOutlet weak var latitudeTextLabel: UILabel!
+    @IBOutlet weak var longitudeTextLabel: UILabel!
+    @IBOutlet weak var containerView: UIView!
+    
+    let locationManager = CLLocationManager()
     
     var location: CLLocation?
     var lastLocationError: Error?
     var updatingLocation = false
     
+    let geocoder = CLGeocoder()
     var placemark: CLPlacemark?
     var lastGeocodingError: Error?
     var performingReverseGeocoding = false
     
     var timer: Timer?
+    
     var managedObjectContext: NSManagedObjectContext!
+    
+    var logoVisible = false
+    
+    var soundID: SystemSoundID = 0
+    
+    // Create a custom UI Button using Logo.png image that calls getLocation() when tapped
+    // () Needed after {} to initialise the stored property within a closure
+    lazy var logoButton: UIButton = {
+        
+        let button = UIButton(type: .custom)
+        button.setBackgroundImage(UIImage(named: "Logo"), for: .normal)
+        button.sizeToFit()
+        button.addTarget(self, action: #selector(getLocation), for: .touchUpInside)
+        
+        button.center.x = self.view.bounds.midX
+        button.center.y = 220
+        return button
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         updateLabels()
         configureGetButton()
+        loadSoundEffect("Sound.caf")
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
@@ -43,7 +73,7 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "TagLocation" {
-           
+            
             let navigationController = segue.destination as! UINavigationController
             let controller = navigationController.topViewController as! LocationDetailsViewController
             
@@ -52,13 +82,6 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
             controller.managedObjectContext = managedObjectContext
         }
     }
-
-    @IBOutlet weak var messageLabel: UILabel!
-    @IBOutlet weak var latitudeLabel: UILabel!
-    @IBOutlet weak var longitudeLabel: UILabel!
-    @IBOutlet weak var addressLabel: UILabel!
-    @IBOutlet weak var tagButton: UIButton!
-    @IBOutlet weak var getButton: UIButton!
     
     // Checks current authorization status. If notDetermined then app will request "When In Use" Authorization. Alternatively use "Always" authorization.
     // Alert is shown if authorization is denied or restricted; location manager is not started and labels not updated.
@@ -76,8 +99,15 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
             showLocationServicesDeniedAlert()
             return
         }
+        
+        if logoVisible {
+            print("** Get Location Pressed. Logo is Visible, Hide the Logo View")
+            hideLogoView()
+        }
+        
         if updatingLocation {
             stopLocationManager()
+            
         } else {
             location = nil
             lastLocationError = nil
@@ -96,6 +126,122 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
         alert.addAction(okAction)
         present(alert, animated: true, completion: nil)
     }
+    
+    // Location instance variable is optional, thus use if let. If the location variable is not nil, then convert latitude and longitude into Strings and place them into labels
+    // Format string used to control the number of decimal points. Placeholders always start with %. %d for integer, %f for decimals, %@ for arbitrary objects. ".8" means there should always be 8 digits behind the decimal point
+    // If the location manager gave an error, label will show an error message. kCLErrorDomain means a Core Location error, otherwise all other errors display a generic error message.
+    // If the geocoder has a placemark, then update the address Label depending on the status, error, or placemark returned
+    
+    func updateLabels(){
+        if let location = location {
+            latitudeLabel.text = String(format:"%.8f", location.coordinate.latitude)
+            longitudeLabel.text = String(format: "%.8f", location.coordinate.longitude)
+            tagButton.isHidden = false
+            messageLabel.text = ""
+            
+            latitudeTextLabel.isHidden = false
+            longitudeTextLabel.isHidden = false
+            
+            if let placemark = placemark {
+                addressLabel.text = string(from: placemark)
+            } else if performingReverseGeocoding {
+                addressLabel.text = "Searching for Address"
+            } else if lastGeocodingError != nil {
+                addressLabel.text = "Error Finding Address"
+            } else {
+                addressLabel.text = "No Address Found"
+            }
+            
+        } else {
+            latitudeLabel.text = ""
+            longitudeLabel.text = ""
+            addressLabel.text = ""
+            tagButton.isHidden = true
+            messageLabel.text = "Tap 'Get My Location' to Start"
+        
+        let statusMessage: String
+        if let error = lastLocationError as? NSError {
+            if error.domain == kCLErrorDomain && error.code == CLError.denied.rawValue {
+                statusMessage = "Location Services Disabled. Please enable Location Services in Settings"
+            } else {
+                statusMessage = "Error Getting Location"
+            }
+        } else if !CLLocationManager.locationServicesEnabled() {
+            statusMessage = "Location Services Disabled"
+        } else if updatingLocation {
+            statusMessage = "Searching..."
+        } else {
+            statusMessage = ""
+            print("No Coordinates or Error Messages to Display")
+            showLogoView()
+        }
+        
+        messageLabel.text = statusMessage
+        latitudeTextLabel.isHidden = true
+        longitudeTextLabel.isHidden = true
+        }
+    }
+    // MARK: - Logo View
+    
+    // Hide container view (labels) and place logoButton object on screen
+    func showLogoView() {
+        print("*** SHOW LOGO VIEW")
+        if !logoVisible {
+            logoVisible = true
+            containerView.isHidden = true
+            view.addSubview(logoButton)
+        }
+    }
+    
+    func hideLogoView() {
+        print("*** HIDE LOGO VIEW")
+        
+        if !logoVisible { return }
+        
+        logoVisible = false
+        containerView.isHidden = false
+        containerView.center.x = view.bounds.size.width * 2
+        containerView.center.y = 40 + containerView.bounds.size.height / 2
+        
+        let centerX = view.bounds.midX
+        
+        let panelMover = CABasicAnimation(keyPath: "position")
+        panelMover.isRemovedOnCompletion = false
+        panelMover.fillMode = kCAFillModeForwards
+        panelMover.duration = 0.6
+        panelMover.fromValue = NSValue(cgPoint: containerView.center)
+        panelMover.toValue = NSValue(cgPoint: CGPoint(x: centerX, y: containerView.center.y))
+        panelMover.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+        panelMover.delegate = self
+        containerView.layer.add(panelMover, forKey: "panelMover")
+        
+        let logoMover = CABasicAnimation(keyPath: "position")
+        logoMover.isRemovedOnCompletion = false
+        logoMover.fillMode = kCAFillModeForwards
+        logoMover.duration = 0.5
+        logoMover.fromValue = NSValue(cgPoint: logoButton.center)
+        logoMover.toValue = NSValue(cgPoint: CGPoint(x: -centerX, y: logoButton.center.y))
+        logoMover.timingFunction = CAMediaTimingFunction( name: kCAMediaTimingFunctionEaseIn)
+        logoButton.layer.add(logoMover, forKey: "logoMover")
+        
+        let logoRotator = CABasicAnimation(keyPath: "transform.rotation.z")
+        logoRotator.isRemovedOnCompletion = false
+        logoRotator.fillMode = kCAFillModeForwards
+        logoRotator.duration = 0.5
+        logoRotator.fromValue = 0.0
+        logoRotator.toValue = -2 * M_PI
+        logoRotator.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+        logoButton.layer.add(logoRotator, forKey: "logoRotator")
+    }
+    
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        containerView.layer.removeAllAnimations()
+        containerView.center.x = view.bounds.size.width / 2
+        containerView.center.y = 40 + containerView.bounds.size.height / 2
+        logoButton.layer.removeAllAnimations()
+        logoButton.removeFromSuperview()
+    }
+    
     
     // Set up for location manager. Telling it who is the delegate and setting accuracy, then calling the action.
     // Sets up a timer object that sends a didTimeOut message to self after 60 seconds
@@ -125,13 +271,28 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
         }
     }
     
-    // If updatingLocation variable is true then set the title to "Stop", otherwise set to "Get My Location"
+    // If updatingLocation variable is true then set the title to "Stop" and create an activity indicator, otherwise set to "Get My Location"
     
     func configureGetButton(){
+        let spinnerTag = 1000
+       
         if updatingLocation {
             getButton.setTitle("Stop", for: .normal)
+            
+            if view.viewWithTag(spinnerTag) == nil {
+                let spinner = UIActivityIndicatorView(activityIndicatorStyle: .white)
+                spinner.center = messageLabel.center
+                spinner.center.y += spinner.bounds.size.height/2 + 15
+                spinner.startAnimating()
+                spinner.tag = spinnerTag
+                containerView.addSubview(spinner)
+            }
         } else {
             getButton.setTitle("Get My Location", for: .normal)
+            
+            if let spinner = view.viewWithTag(spinnerTag) {
+                spinner.removeFromSuperview()
+            }
         }
     }
     
@@ -153,7 +314,7 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
     }
     
     
-    // MARK: - CLLocationManagerDelegate Methods
+    //MARK: - CLLocationManagerDelegate Methods
 
 // DID FAIL WITH ERROR DELEGATE FUNCTION
     // CL Location Manager Delegate Method, deals with Errors:
@@ -245,6 +406,13 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
                 
                 self.lastGeocodingError = error
                 if error == nil, let p = placemarks, !p.isEmpty {
+                    
+                    // If placemark is nil then it is the first time reverse geocoding an address. Play the Sound. 
+                    if self.placemark == nil {
+                        print("FIRST TIME!")
+                        self.playSoundEffect()
+                    }
+                    
                     self.placemark = p.last!
                 } else {
                     self.placemark = nil
@@ -264,53 +432,6 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
         }
     }
     
-    // Location instance variable is optional, thus use if let. If the location variable is not nil, then convert latitude and longitude into Strings and place them into labels
-    // Format string used to control the number of decimal points. Placeholders always start with %. %d for integer, %f for decimals, %@ for arbitrary objects. ".8" means there should always be 8 digits behind the decimal point
-    // If the location manager gave an error, label will show an error message. kCLErrorDomain means a Core Location error, otherwise all other errors display a generic error message.
-    // If the geocoder has a placemark, then update the address Label depending on the status, error, or placemark returned
-    
-    func updateLabels(){
-        if let location = location {
-            latitudeLabel.text = String(format:"%.8f", location.coordinate.latitude)
-            longitudeLabel.text = String(format: "%.8f", location.coordinate.longitude)
-            tagButton.isHidden = false
-            messageLabel.text = ""
-            
-            if let placemark = placemark {
-                addressLabel.text = string(from: placemark)
-            } else if performingReverseGeocoding {
-                addressLabel.text = "Searching for Address"
-            } else if lastGeocodingError != nil {
-                addressLabel.text = "Error Finding Address"
-            } else {
-                addressLabel.text = "No Address Found"
-            }
-            
-        } else {
-            latitudeLabel.text = ""
-            longitudeLabel.text = ""
-            addressLabel.text = ""
-            tagButton.isHidden = true
-            messageLabel.text = "Tap 'Get My Location' to Start"
-        }
-        
-        let statusMessage: String
-        if let error = lastLocationError as? NSError {
-            if error.domain == kCLErrorDomain && error.code == CLError.denied.rawValue {
-                statusMessage = "Location Services Disabled. Please enable Location Services in Settings"
-            } else {
-                statusMessage = "Error Getting Location"
-            }
-        } else if !CLLocationManager.locationServicesEnabled() {
-            statusMessage = "Location Services Disabled"
-        } else if updatingLocation {
-            statusMessage = "Searching..."
-        } else {
-            statusMessage = "Tap 'Get My Location' to Start"
-        }
-        
-        messageLabel.text = statusMessage
-    }
     
     // If the placemark has a subThoroughfare (house number) then add it to the string line1. Perform the same logic for thoroughfare (street name), locality (city), administrative area (state), and postal code
     // \n adds a line break into the string
@@ -328,5 +449,28 @@ class CurrentLocationViewController: UIViewController, CLLocationManagerDelegate
         
         line1.add(text: line2, separatedBy: "\n")
         return line1
+    }
+    
+    // MARK: - Sound Effect
+    
+    // Load sound file and place it into a new sound object
+    func loadSoundEffect(_ name: String) {
+        if let path = Bundle.main.path(forResource: name, ofType: nil) {
+            let fileURL = URL(fileURLWithPath: path, isDirectory: false)
+            let error = AudioServicesCreateSystemSoundID(fileURL as CFURL, &soundID)
+            
+            if error != kAudioServicesNoError {
+                print("Error code \(error) loading sound at path \(path)")
+            }
+        }
+    }
+    
+    func unloadSoundEffect() {
+        AudioServicesDisposeSystemSoundID(soundID)
+        soundID = 0
+    }
+    
+    func playSoundEffect() {
+        AudioServicesPlaySystemSound(soundID)
     }
 }

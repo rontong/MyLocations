@@ -18,11 +18,11 @@
 		F295C73E20E89F1300D8F4D9 /* CurrentLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F295C73D20E89F1300D8F4D9 /* CurrentLocationViewController.swift */; };
 		F295C74320E89F1300D8F4D9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F295C74120E89F1300D8F4D9 /* Main.storyboard */; };
 		F295C74520E89F1600D8F4D9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F295C74420E89F1600D8F4D9 /* Assets.xcassets */; };
-		F295C74820E89F1600D8F4D9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F295C74620E89F1600D8F4D9 /* LaunchScreen.storyboard */; };
 		F299400720EB8F300036E597 /* LocationDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F299400620EB8F300036E597 /* LocationDetailsViewController.swift */; };
 		F2AA79CC211C0FD7003DA3B6 /* MyTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2AA79CB211C0FD7003DA3B6 /* MyTabBarController.swift */; };
 		F2AA79CE211C10CB003DA3B6 /* MyNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2AA79CD211C10CB003DA3B6 /* MyNavigationController.swift */; };
 		F2AA79D0211C1149003DA3B6 /* MyImagePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2AA79CF211C1149003DA3B6 /* MyImagePickerController.swift */; };
+		F2AA79D2211C2D68003DA3B6 /* Sound in Resources */ = {isa = PBXBuildFile; fileRef = F2AA79D1211C2D68003DA3B6 /* Sound */; };
 		F2AF659D20ECC452007C70C6 /* CategoryPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2AF659C20ECC452007C70C6 /* CategoryPickerViewController.swift */; };
 		F2AF659F20ECD6E1007C70C6 /* HudView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2AF659E20ECD6E1007C70C6 /* HudView.swift */; };
 		F2B69EE320F079A500B90FA0 /* LocationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2B69EE220F079A500B90FA0 /* LocationCell.swift */; };
@@ -43,12 +43,12 @@
 		F295C73D20E89F1300D8F4D9 /* CurrentLocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentLocationViewController.swift; sourceTree = "<group>"; };
 		F295C74220E89F1300D8F4D9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F295C74420E89F1600D8F4D9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		F295C74720E89F1600D8F4D9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F295C74920E89F1600D8F4D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F299400620EB8F300036E597 /* LocationDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDetailsViewController.swift; sourceTree = "<group>"; };
 		F2AA79CB211C0FD7003DA3B6 /* MyTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTabBarController.swift; sourceTree = "<group>"; };
 		F2AA79CD211C10CB003DA3B6 /* MyNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyNavigationController.swift; sourceTree = "<group>"; };
 		F2AA79CF211C1149003DA3B6 /* MyImagePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyImagePickerController.swift; sourceTree = "<group>"; };
+		F2AA79D1211C2D68003DA3B6 /* Sound */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sound; sourceTree = "<group>"; };
 		F2AF659C20ECC452007C70C6 /* CategoryPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryPickerViewController.swift; sourceTree = "<group>"; };
 		F2AF659E20ECD6E1007C70C6 /* HudView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HudView.swift; sourceTree = "<group>"; };
 		F2B69EE220F079A500B90FA0 /* LocationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCell.swift; sourceTree = "<group>"; };
@@ -71,6 +71,7 @@
 		F220878C2116E51D00F78F44 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F2AA79D1211C2D68003DA3B6 /* Sound */,
 				F220878D2116E51D00F78F44 /* MapKit.framework */,
 			);
 			name = Frameworks;
@@ -139,7 +140,6 @@
 				F24B37D220ED93B10010A440 /* View */,
 				F24B37D320ED93BF0010A440 /* Controller */,
 				F295C74420E89F1600D8F4D9 /* Assets.xcassets */,
-				F295C74620E89F1600D8F4D9 /* LaunchScreen.storyboard */,
 				F295C74920E89F1600D8F4D9 /* Info.plist */,
 			);
 			path = MyLocations;
@@ -208,8 +208,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F295C74820E89F1600D8F4D9 /* LaunchScreen.storyboard in Resources */,
 				F295C74520E89F1600D8F4D9 /* Assets.xcassets in Resources */,
+				F2AA79D2211C2D68003DA3B6 /* Sound in Resources */,
 				F295C74320E89F1300D8F4D9 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -250,14 +250,6 @@
 				F295C74220E89F1300D8F4D9 /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		F295C74620E89F1600D8F4D9 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F295C74720E89F1600D8F4D9 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -381,6 +373,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 84J79UPTB3;
 				INFOPLIST_FILE = MyLocations/Info.plist;
@@ -399,6 +392,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 84J79UPTB3;
 				INFOPLIST_FILE = MyLocations/Info.plist;
