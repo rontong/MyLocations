@@ -17,12 +17,18 @@ class CategoryPickerViewController: UITableViewController {
     
     var selectedIndexPath = IndexPath()
     
-    // Loop through the array of categories and compare each to the selectedCategoryName. If there is  match, create an index-path object and store it in selectedIndexPath. Break the loop once a match is found.
-    // Looks at categories[0], then categories [1] and so on to see if it matches selectedCategoryName (sent via the segue)
+   
     
     override func viewDidLoad() {
         super.viewDidLoad()
+       
+        tableView.backgroundColor = UIColor.black
+        tableView.separatorColor = UIColor(white: 1.0, alpha: 0.2)
+        tableView.indicatorStyle = .white
         
+    // Loop through the array of categories and compare each to the selectedCategoryName. If there is  match, create an index-path object and store it in selectedIndexPath. Break the loop once a match is found.
+    // Looks at categories[0], then categories [1] and so on to see if it matches selectedCategoryName (sent via the segue){
+       
         for i in 0..<categories.count {
             if categories[i] == selectedCategoryName {
                 selectedIndexPath = IndexPath(row: i, section: 0)
@@ -63,7 +69,24 @@ class CategoryPickerViewController: UITableViewController {
         return cell
     }
     
-    // MARK: - UITableViewDelegate
+    // MARK: - UITableViewDelegate Methods
+    
+    // Change appearance of cells
+    
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.backgroundColor = UIColor.black
+        
+        if let textLabel = cell.textLabel {
+            textLabel.textColor = UIColor.white
+            textLabel.highlightedTextColor = textLabel.textColor
+        }
+        
+        let selectionView = UIView(frame: CGRect.zero)
+        selectionView.backgroundColor = UIColor(white: 1.0, alpha: 0.2)
+        cell.selectedBackgroundView = selectionView
+    }
+    
+    
     // Removes checkmark from the previously selected cell (selectedIndexPath from for in loop) and add a checkmark to the row that is tapped
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

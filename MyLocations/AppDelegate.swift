@@ -48,6 +48,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let tabBarController = window!.rootViewController as! UITabBarController
         if let tabBarViewControllers = tabBarController.viewControllers {
             
+            customizeAppearance()
+            
             let currentLocationViewController = tabBarViewControllers[0] as! CurrentLocationViewController
             currentLocationViewController.managedObjectContext = managedObjectContext
             
@@ -111,6 +113,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             return rootViewController
         }
+    }
+    
+    // Change color of all navigation bars and tab bars in the app
+    func customizeAppearance() {
+        UINavigationBar.appearance().barTintColor = UIColor.black
+        UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white ]
+        UITabBar.appearance().barTintColor = UIColor.black
+        
+        let tintColor = UIColor(red: 255/255.0, green: 238/255.0, blue: 136/255.0, alpha: 1.0)
+        UITabBar.appearance().tintColor = tintColor
     }
     
 }
